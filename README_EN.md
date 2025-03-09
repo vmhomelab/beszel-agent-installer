@@ -35,7 +35,7 @@ Big thanks to Alex for providing a tutorial on how to create the agent.exe. Chec
    - Accept the license agreement
    - Choose between installation or uninstallation
    - Optionally create a firewall rule
-   - Enter the user key
+   - Enter the public key you got from beszel (Add system --> choose binary)
 4. **Click "Install"** and wait for the process to complete.
 5. **Check if the service is running:**
    ```sh
