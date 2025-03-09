@@ -1,4 +1,4 @@
-❗️I am working currently on an english version of the software.❗️
+❗️I am currently working on an english version of the software.❗️
 
 # Beszel Agent Installer
 
