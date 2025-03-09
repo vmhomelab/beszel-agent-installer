@@ -32,7 +32,7 @@ Großes Dankeschön an Alex für das Tutorial zum erstellen der agent.exe. Die A
    - Lizenzbedingungen akzeptieren
    - Installations- oder Deinstallationsmodus wählen
    - Firewall-Regel erstellen (optional)
-   - Public Key eingeben
+   - Public Key eingeben (auf beszel auf System hinzufügen --> binär auswählen)
 4. **Klicke auf „Installieren“** und warte, bis der Prozess abgeschlossen ist.
 5. **Überprüfe, ob der Dienst läuft:**
    ```sh
