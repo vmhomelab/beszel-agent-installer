@@ -1,3 +1,5 @@
+❗️I am working currently on an english version.❗️
+
 # Beszel Agent Installer
 
 You need beszel installed for this software. You'll find beszel here: https://github.com/henrygd/beszel
