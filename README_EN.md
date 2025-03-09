@@ -1,4 +1,8 @@
+❗️I am currently working on an english version of the software.❗️
+
 # Beszel Agent Installer
+
+You need beszel installed for this software. You'll find beszel here: https://github.com/henrygd/beszel
 
 ## 🔍 Overview
 The **Beszel Agent Installer** is a Windows installation program that installs or removes the Beszel Agent on a system. The installer can optionally create a firewall rule for communication and register the agent as a Windows service using **NSSM (Non-Sucking Service Manager)**.
@@ -31,7 +35,7 @@ Big thanks to Alex for providing a tutorial on how to create the agent.exe. Chec
    - Accept the license agreement
    - Choose between installation or uninstallation
    - Optionally create a firewall rule
-   - Enter the user key
+   - Enter the public key you got from beszel (Add system --> choose binary)
 4. **Click "Install"** and wait for the process to complete.
 5. **Check if the service is running:**
    ```sh
