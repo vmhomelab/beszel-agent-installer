@@ -1,5 +1,7 @@
 # Beszel Agent Installer
 
+Das ist eine Software für Beszel von Hank. Beszel findet ihr hier: https://github.com/henrygd/beszel
+
 ## 🔍 Übersicht
 Der **Beszel Agent Installer** ist ein Windows-Installationsprogramm, das den Beszel-Agenten auf einem System installiert oder entfernt. Der Installer kann optional eine Firewall-Regel für die Kommunikation erstellen und den Agent als Windows-Dienst mit **NSSM (Non-Sucking Service Manager)** registrieren.
 
