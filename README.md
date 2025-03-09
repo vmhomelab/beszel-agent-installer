@@ -19,6 +19,7 @@ Der **Beszel Agent Installer** ist ein Windows-Installationsprogramm, das den Be
 ### **1️⃣ Voraussetzungen**
 - Windows 10 oder 11 (64-Bit)
 - Administratorrechte
+- **HINWEIS**: Du wirst wahrschinlich dein Antivirus deaktivieren müssen, da die Anwendung nicht signiert ist!
 - Chocolatey (`choco`) muss installiert sein (wird bei Bedarf automatisch installiert)
 
 ### **2️⃣ Installation**
