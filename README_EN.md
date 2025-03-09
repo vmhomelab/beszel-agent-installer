@@ -3,6 +3,8 @@
 ## 🔍 Overview
 The **Beszel Agent Installer** is a Windows installation program that installs or removes the Beszel Agent on a system. The installer can optionally create a firewall rule for communication and register the agent as a Windows service using **NSSM (Non-Sucking Service Manager)**.
 
+Big thanks to Alex for providing a tutorial on how to create the agent.exe. Check out his blog here: https://blog.ktz.me/using-beszel-to-monitor-windows/amp/
+
 ## 🚀 Features
 - **Installs the Beszel Agent** in `C:\Program Files\beszel-agent` (or `C:\Programme\beszel-agent` on German systems)
 - **Optional creation of a firewall rule** for port **45876**
