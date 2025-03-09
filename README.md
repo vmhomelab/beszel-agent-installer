@@ -1,0 +1,1 @@
+# beszel-agent-installer
