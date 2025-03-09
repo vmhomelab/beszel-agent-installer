@@ -81,7 +81,7 @@ class InstallerApp:
         if self.current_page == 4 and self.user_choice.get() == "install":
             key = self.user_key.get().strip()
             if not key:
-                messagebox.showwarning("Fehlender Key", "Bitte geben Sie einen Benutzer-Schlüssel ein.")
+                messagebox.showwarning("Fehlender Key", "Bitte geben Sie einen Public Key ein.")
                 return
 
         if self.current_page < len(self.pages) - 1:
