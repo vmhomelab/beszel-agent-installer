@@ -1,6 +1,5 @@
-❗️I am currently working on an english version of the software.❗️
-
 # Beszel Agent Installer
+![beszelagent](https://github.com/user-attachments/assets/a742c2a7-6e44-48da-82da-a0031e8b65f7)
 
 You need beszel installed for this software. You'll find beszel here: https://github.com/henrygd/beszel
 
