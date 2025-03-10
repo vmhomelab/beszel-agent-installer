@@ -11,7 +11,7 @@ Großes Dankeschön an Alex für das Tutorial zum erstellen der agent.exe. Die A
 - **Installation des Beszel-Agenten** in `C:\Program Files\beszel-agent` (bzw. `C:\Programme\beszel-agent` auf deutschen Systemen)
 - **Optionale Erstellung einer Firewall-Regel** für Port **45876**
 - **Registrierung als Windows-Dienst** über **NSSM**
-- **Eingabe eines Benutzer-Keys** zur Konfiguration
+- **Eingabe eines Keys** zur Konfiguration
 - **Deinstallation des Beszel-Agenten**
   - Stoppt und entfernt den Dienst
   - Löscht das Installationsverzeichnis
@@ -27,12 +27,11 @@ Großes Dankeschön an Alex für das Tutorial zum erstellen der agent.exe. Die A
 - Chocolatey (`choco`) muss installiert sein (wird bei Bedarf automatisch installiert)
 
 ### **2️⃣ Installation**
-1. **Lade die Installer-Dateien herunter** (Installer `.exe` + `agent.exe`).
+1. **Lade die Installer-Dateien herunter** (Installer `.exe`).
 2. **Starte den Installer (`installer.exe`)** mit **Administratorrechten**.
 3. **Folge den Anweisungen** im Installationsassistenten:
    - Lizenzbedingungen akzeptieren
-   - Installations- oder Deinstallationsmodus wählen
-   - Firewall-Regel erstellen (optional)
+   - Installations-, Deinstallationsmodus oder Update wählen
    - Public Key eingeben (auf beszel auf System hinzufügen --> binär auswählen)
 4. **Klicke auf „Installieren“** und warte, bis der Prozess abgeschlossen ist.
 5. **Überprüfe, ob der Dienst läuft:**
