@@ -10,12 +10,13 @@ Big thanks to Alex for providing a tutorial on how to create the agent.exe. Chec
 
 ## 🚀 Features
 - **Installs the Beszel Agent** in `C:\Program Files\beszel-agent` (or `C:\Programme\beszel-agent` on German systems)
-- **Optional creation of a firewall rule** for port **45876**
+- **Creation of a firewall rule** for port **45876**
 - **Registers as a Windows service** using **NSSM**
 - **Allows user key input** for configuration
 - **Uninstallation of the Beszel Agent**
   - Stops and removes the service
   - Deletes the installation directory
+- Updating the agent
 - **Graphical installation wizard with progress bar**
 - **Log file for troubleshooting** (`install.log`)
 
@@ -28,7 +29,7 @@ Big thanks to Alex for providing a tutorial on how to create the agent.exe. Chec
 - Chocolatey (`choco`) must be installed (automatically installed if necessary)
 
 ### **2️⃣ Installation**
-1. **Download the installer files** (`installer.exe` + `agent.exe`).
+1. **Download the installer files** (`installer.exe`).
 2. **Run `installer.exe`** with **administrator privileges**.
 3. **Follow the installation steps** in the wizard:
    - Accept the license agreement
