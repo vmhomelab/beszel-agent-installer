@@ -31,8 +31,8 @@ Großes Dankeschön an Alex für das Tutorial zum erstellen der agent.exe. Die A
 2. **Starte den Installer (`installer.exe`)** mit **Administratorrechten**.
 3. **Folge den Anweisungen** im Installationsassistenten:
    - Lizenzbedingungen akzeptieren
-   - Installations-, Deinstallationsmodus oder Update wählen
-   - Public Key eingeben (auf beszel auf System hinzufügen --> binär auswählen)
+   - Installation wählen
+   - Public Key eingeben (auf Beszel auf "System hinzufügen" --> binär auswählen)
 4. **Klicke auf „Installieren“** und warte, bis der Prozess abgeschlossen ist.
 5. **Überprüfe, ob der Dienst läuft:**
    ```sh
@@ -46,6 +46,13 @@ Großes Dankeschön an Alex für das Tutorial zum erstellen der agent.exe. Die A
 3. Der Installer:
    - Stoppt und entfernt den **Beszel-Agent-Dienst**.
    - Löscht das Verzeichnis `C:\Program Files\beszel-agent\`.
+
+### **4️⃣ Update**
+1. **Starte `installer.exe`** mit **Administratorrechten**.
+2. **Wähle „Update“**.
+3. Der Installer:
+   - Überprüft, ob eine neue Version des Agents verfügbar ist
+   - Updated diesen gegebenenfalls
 
 ## 🔧 Fehlerbehebung
 Falls der Installer nicht korrekt funktioniert, prüfe die **Log-Datei**:
