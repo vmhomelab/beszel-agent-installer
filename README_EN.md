@@ -33,7 +33,7 @@ Big thanks to Alex for providing a tutorial on how to create the agent.exe. Chec
 2. **Run `installer.exe`** with **administrator privileges**.
 3. **Follow the installation steps** in the wizard:
    - Accept the license agreement
-   - Choose between installation or uninstallation
+   - Choose installation
    - Optionally create a firewall rule
    - Enter the public key you got from beszel (Add system --> choose binary)
 4. **Click "Install"** and wait for the process to complete.
@@ -49,6 +49,13 @@ Big thanks to Alex for providing a tutorial on how to create the agent.exe. Chec
 3. The installer:
    - Stops and removes the **Beszel Agent service**.
    - Deletes the directory `C:\Program Files\beszel-agent\`.
+
+### **4️⃣ Update**
+1. **Run `installer.exe`** with **administrator privileges**.
+2. **Select "Update"**.
+3. The instsller:
+   - will cehck if a newer version of the agent is available
+   - update the agent if necessary
 
 ## 🔧 Troubleshooting
 If the installer does not work correctly, check the **log file**:
