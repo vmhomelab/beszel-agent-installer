@@ -18,7 +18,6 @@ class InstallerApp:
             self.page_welcome, 
             self.page_license, 
             self.page_choice,
-            #self.page_firewall,
             self.page_key,
             self.page_env_vars,
             self.page_overview,
@@ -392,14 +391,6 @@ The GNU General Public License does not permit incorporating your program into p
             self.page_uninstall()
         elif choice == "update":
             self.page_update()
-
-
-    # def page_firewall(self):
-    #     self.clear_frame()
-    #     tk.Label(self.frame, text="Would you like to create a firewall rule for port 45876?", font=("Arial", 12, "bold")).pack()
-    #     tk.Radiobutton(self.frame, text="Yes (recommended)", variable=self.firewall_choice, value="yes").pack(anchor='w')
-    #     tk.Radiobutton(self.frame, text="No", variable=self.firewall_choice, value="no").pack(anchor='w')
-    #     self.next_button.config(state=tk.NORMAL)
 
     def page_key(self):
         self.clear_frame()
