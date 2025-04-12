@@ -18,8 +18,9 @@ class InstallerApp:
             self.page_welcome, 
             self.page_license, 
             self.page_choice,
-            self.page_firewall,
-            self.page_key, 
+            #self.page_firewall,
+            self.page_key,
+            self.page_env_vars,
             self.page_overview,
             self.page_installation,
             self.page_update,
@@ -45,7 +46,9 @@ class InstallerApp:
         self.firewall_choice = tk.StringVar(value="yes")
         self.user_key = tk.StringVar()
         self.license_var = tk.BooleanVar()
-        
+
+        self.env_vars = {}  # Store environment variables here
+
         self.install_path = os.path.join(
             os.environ.get("ProgramW6432", os.environ.get("ProgramFiles", "C:\\Program Files")),
             "beszel-agent"
@@ -60,6 +63,36 @@ class InstallerApp:
 
         self.pages[self.current_page]()
 
+    def page_env_vars(self):
+        self.clear_frame()
+        tk.Label(self.frame, text="Setze Systemumgebungsvariablen (optional)", font=("Arial", 12, "bold")).pack(pady=5)
+
+        var_name = tk.StringVar()
+        var_value = tk.StringVar()
+
+        def add_variable():
+            name = var_name.get().strip()
+            value = var_value.get().strip()
+            if name and value:
+                self.env_vars[name] = value
+                tk.Label(self.frame, text=f"{name} = {value}").pack()
+                var_name.set("")
+                var_value.set("")
+
+        entry_frame = tk.Frame(self.frame)
+        entry_frame.pack(pady=10)
+
+        tk.Label(entry_frame, text="Name:").grid(row=0, column=0)
+        tk.Entry(entry_frame, textvariable=var_name).grid(row=0, column=1, padx=5)
+
+        tk.Label(entry_frame, text="Value:").grid(row=1, column=0)
+        tk.Entry(entry_frame, textvariable=var_value).grid(row=1, column=1, padx=5)
+
+        tk.Button(self.frame, text="Hinzufügen", command=add_variable).pack(pady=5)
+
+        self.next_button.config(state=tk.NORMAL)
+        self.next_button.pack(side=tk.RIGHT, padx=10, pady=10)
+
     def log(self, message):
         os.makedirs(self.install_path, exist_ok=True)
         with open(self.log_file, "a") as log:
@@ -69,6 +102,20 @@ class InstallerApp:
     def clear_frame(self):
         for widget in self.frame.winfo_children():
             widget.destroy()
+
+    def show_navigation(self, back=True, next=True, cancel=True):
+        # First hide all buttons
+        self.back_button.pack_forget()
+        self.next_button.pack_forget()
+        self.cancel_button.pack_forget()
+
+        # Re-show based on args
+        if back:
+            self.back_button.pack(side=tk.LEFT, padx=10, pady=10)
+        if cancel:
+            self.cancel_button.pack(side=tk.RIGHT, padx=10, pady=10)
+        if next:
+            self.next_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
     def next_page(self):
         if self.current_page == 1 and not self.license_var.get():
@@ -347,12 +394,12 @@ The GNU General Public License does not permit incorporating your program into p
             self.page_update()
 
 
-    def page_firewall(self):
-        self.clear_frame()
-        tk.Label(self.frame, text="Would you like to create a firewall rule for port 45876?", font=("Arial", 12, "bold")).pack()
-        tk.Radiobutton(self.frame, text="Yes (recommended)", variable=self.firewall_choice, value="yes").pack(anchor='w')
-        tk.Radiobutton(self.frame, text="No", variable=self.firewall_choice, value="no").pack(anchor='w')
-        self.next_button.config(state=tk.NORMAL)
+    # def page_firewall(self):
+    #     self.clear_frame()
+    #     tk.Label(self.frame, text="Would you like to create a firewall rule for port 45876?", font=("Arial", 12, "bold")).pack()
+    #     tk.Radiobutton(self.frame, text="Yes (recommended)", variable=self.firewall_choice, value="yes").pack(anchor='w')
+    #     tk.Radiobutton(self.frame, text="No", variable=self.firewall_choice, value="no").pack(anchor='w')
+    #     self.next_button.config(state=tk.NORMAL)
 
     def page_key(self):
         self.clear_frame()
@@ -366,11 +413,15 @@ The GNU General Public License does not permit incorporating your program into p
 
         self.next_button.pack_forget()
 
+        self.show_navigation(back=True, next=False)
+
     def confirm_key(self):
         key = self.user_key.get().strip()
         if key:
             self.log(f"Öffentlicher Schlüssel gespeichert: {key}")
-            self.page_overview()
+            self.current_page = self.pages.index(self.page_key)  # Ensure it's correct
+            self.current_page += 1
+            self.pages[self.current_page]()
         else:
             messagebox.showwarning("Öffentlicher Schlüssel fehlt", "Bitte geben Sie einen gültigen öffentlichen Schlüssel ein")
 
@@ -379,6 +430,10 @@ The GNU General Public License does not permit incorporating your program into p
         tk.Label(self.frame, text="Übersicht der Einstellungen", font=("Arial", 12, "bold")).pack()
         tk.Label(self.frame, text=f"Installation: {'Ja' if self.user_choice.get() == 'install' else 'Nein'}").pack()
         tk.Label(self.frame, text=f"Öffentlicher Schlüssel: {self.user_key.get()}").pack()
+        if self.env_vars:
+            tk.Label(self.frame, text="Systemumgebungsvariablen:", font=("Arial", 10, "bold")).pack(pady=(10, 0))
+            for name, value in self.env_vars.items():
+                tk.Label(self.frame, text=f"  {name} = {value}").pack(anchor="w", padx=20)
 
         self.back_button.pack_forget()
         self.next_button.pack_forget()
@@ -432,6 +487,8 @@ The GNU General Public License does not permit incorporating your program into p
         self.cancel_button.pack_forget()
 
         self.progress["value"] = 100
+
+        self.show_navigation(back=False, next=False, cancel=False)
 
         self.root.after(500, self.install_agent)
 
@@ -571,6 +628,28 @@ The GNU General Public License does not permit incorporating your program into p
             subprocess.run([nssm_path, "set", "beszelagent", "AppEnvironmentExtra", f"KEY={self.user_key.get()}"])
             self.log_install("SCHLÜSSEL gesetzt.")
             self.log("SCHLÜSSEL gesetzt.")
+
+        # Apply user-defined environment variables
+        if self.env_vars:
+            self.log_install("Setting custom environment variables...")
+            for name, value in self.env_vars.items():
+                for name, value in self.env_vars.items():
+                    cmd = [
+                        "reg",
+                        "add",
+                        r"HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment",
+                        "/v", name,
+                        "/t", "REG_SZ",
+                        "/d", value,
+                        "/f"
+                    ]
+                    result = subprocess.run(cmd, capture_output=True, text=True)
+                if result.returncode == 0:
+                    self.log_install(f"Set {name} = {value}")
+                    self.log(f"Set {name} = {value}")
+                else:
+                    self.log_install(f"Failed to set {name}: {result.stderr}")
+                    self.log(f"Failed to set {name}: {result.stderr}")
 
         subprocess.run([nssm_path, "start", "beszelagent"])
         self.log_install("Dienst wurde gestartet.")
