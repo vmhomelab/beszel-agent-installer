@@ -1,0 +1,63 @@
+name: Sync GitHub Issue to Jira
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create-jira-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Jira issue and return ID
+        id: create_jira
+        env:
+          JIRA_USER: ${{ secrets.JIRA_USER }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        run: |
+          echo "Creating Jira issue for: ${{ github.event.issue.title }}"
+
+          RESPONSE=$(curl -s -u "$JIRA_USER:$JIRA_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data '{
+              "fields": {
+                "project": { "id": "10045" },
+                "issuetype": { "id": "10010" },
+                "summary": "'"${{ github.event.issue.title }}"'",
+                "description": {
+                  "type": "doc",
+                  "version": 1,
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "'"${{ github.event.issue.body }}"'"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "labels": ['"$(echo "${{ github.event.issue.labels[*].name }}" | tr " " ",")"']
+              }
+            }' \
+            https://vmhomelab.atlassian.net/rest/api/3/issue)
+
+          echo "Jira API response:"
+          echo "$RESPONSE"
+
+          # Parse Issue Key
+          ISSUE_KEY=$(echo "$RESPONSE" | grep -o '"key":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+          echo "Jira issue key is: $ISSUE_KEY"
+
+          # Export for next step
+          echo "issue_key=$ISSUE_KEY" >> $GITHUB_OUTPUT
+
+      - name: Comment Jira issue link in GitHub Issue
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            🔗 **Jira-Issue erstellt:** [${{ steps.create_jira.outputs.issue_key }}](https://vmhomelab.atlassian.net/browse/${{ steps.create_jira.outputs.issue_key }})
