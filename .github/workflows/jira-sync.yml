@@ -21,4 +21,4 @@ jobs:
                 "issuetype": { "name": "Task" }
               }
             }' \
-            https://vmhomelab.atlassian.atlassian.net/rest/api/3/issue
+            https://vmhomelab.atlassian.net/rest/api/3/issue
