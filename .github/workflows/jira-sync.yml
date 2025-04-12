@@ -9,21 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create Jira issue via API (with IDs and ADF)
+      - name: Create Jira issue via API (Postman-style Auth)
+        env:
+          JIRA_USER: ${{ secrets.JIRA_USER }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
         run: |
           echo "Creating Jira issue for: ${{ github.event.issue.title }}"
 
           curl -X POST \
-            -H "Authorization: Basic ${{ secrets.JIRA_AUTH }}" \
+            -u "$JIRA_USER:$JIRA_TOKEN" \
             -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
             --data '{
               "fields": {
-                "project": {
-                  "id": "10045"
-                },
-                "issuetype": {
-                  "id": "10010"
-                },
+                "project": { "id": "10045" },
+                "issuetype": { "id": "10010" },
+                "summary": "'"${{ github.event.issue.title }}"'",
                 "description": {
                   "type": "doc",
                   "version": 1,
@@ -33,13 +34,12 @@ jobs:
                       "content": [
                         {
                           "type": "text",
-                          "text": "${{ github.event.issue.body }}"
+                          "text": "'"${{ github.event.issue.body }}"'"
                         }
                       ]
                     }
                   ]
-                },
-                "summary": "${{ github.event.issue.title }}"
+                }
               }
             }' \
             https://vmhomelab.atlassian.net/rest/api/3/issue
