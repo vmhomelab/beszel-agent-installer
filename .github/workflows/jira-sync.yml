@@ -1,4 +1,4 @@
-name: Create Jira Issue
+name: Sync GitHub Issue to Jira
 
 on:
   issues:
@@ -7,18 +7,41 @@ on:
 jobs:
   create-jira-issue:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Create Jira issue via API
+      - name: Create Jira issue via API (with IDs and ADF)
         run: |
+          echo "Creating Jira issue for: ${{ github.event.issue.title }}"
+
           curl -X POST \
             -H "Authorization: Basic ${{ secrets.JIRA_AUTH }}" \
             -H "Content-Type: application/json" \
             --data '{
               "fields": {
-                "project": { "key": "GIT" },
-                "summary": "${{ github.event.issue.title }}",
-                "description": "${{ github.event.issue.body }}",
-                "issuetype": { "name": "Task" }
+                "project": {
+                  "id": "10045"
+                },
+                "issuetype": {
+                  "id": "10010"
+                },
+                "description": {
+                  "type": "doc",
+                  "version": 1,
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "${{ github.event.issue.body }}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "summary": "${{ github.event.issue.title }}"
               }
             }' \
             https://vmhomelab.atlassian.net/rest/api/3/issue
+
+          echo "Done ✅"
