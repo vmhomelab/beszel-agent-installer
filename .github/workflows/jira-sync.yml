@@ -1,0 +1,24 @@
+name: Create Jira Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create-jira-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Jira issue via API
+        run: |
+          curl -X POST \
+            -H "Authorization: Basic ${{ secrets.JIRA_AUTH }}" \
+            -H "Content-Type: application/json" \
+            --data '{
+              "fields": {
+                "project": { "key": "GIT" },
+                "summary": "${{ github.event.issue.title }}",
+                "description": "${{ github.event.issue.body }}",
+                "issuetype": { "name": "Task" }
+              }
+            }' \
+            https://vmhomelab.atlassian.atlassian.net/rest/api/3/issue
