@@ -9,7 +9,7 @@ Der **Beszel Agent Installer** ist ein Windows-Installationsprogramm, das den Be
 Großes Dankeschön an Alex für das Tutorial zum erstellen der agent.exe. Die Anleitung findet ihr hier: https://blog.ktz.me/using-beszel-to-monitor-windows/amp/
 ## 🚀 Funktionen
 - **Installation des Beszel-Agenten** in `C:\Program Files\beszel-agent` (bzw. `C:\Programme\beszel-agent` auf deutschen Systemen)
-- **Optionale Erstellung einer Firewall-Regel** für Port **45876**
+- **Erstellung einer Firewall-Regel** für Port **45876**
 - **Registrierung als Windows-Dienst** über **NSSM**
 - **Eingabe eines Keys** zur Konfiguration
 - **Deinstallation des Beszel-Agenten**
