@@ -64,4 +64,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            🔗 **Jira-Issue erstellt:** [${{ steps.create_jira.outputs.issue_key }}](https://vmhomelab.atlassian.net/browse/${{ steps.create_jira.outputs.issue_key }})
+            🔗 **In addition to this github issue, an issue in jira was created!**
