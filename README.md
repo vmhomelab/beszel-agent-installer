@@ -3,6 +3,8 @@
 
 Das ist eine Software für Beszel von Hank. Beszel findet ihr hier: https://github.com/henrygd/beszel
 
+## Check out the englisch README [here](https://github.com/vmhomelab/beszel-agent-installer/blob/main/README_EN.md)
+
 ## 🔍 Übersicht
 Der **Beszel Agent Installer** ist ein Windows-Installationsprogramm, das den Beszel-Agenten auf einem System installiert oder entfernt. Der Installer kann optional eine Firewall-Regel für die Kommunikation erstellen und den Agent als Windows-Dienst mit **NSSM (Non-Sucking Service Manager)** registrieren.
 
@@ -128,3 +130,6 @@ Falls du Fragen oder Probleme hast, erstelle ein **GitHub-Issue** oder kontaktie
 
 📌 **Erstellt von:**  
 **Marko Buculovic - VMHOMELAB** 🚀  
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=vmhomelab/beszel-agent-installer&type=Date)](https://www.star-history.com/#vmhomelab/beszel-agent-installer&Date)
