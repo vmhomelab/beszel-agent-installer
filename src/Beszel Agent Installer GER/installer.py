@@ -6,6 +6,8 @@ import zipfile
 import time
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
+import threading
+
 
 class InstallerApp:
     def __init__(self, root):
@@ -18,7 +20,9 @@ class InstallerApp:
             self.page_welcome, 
             self.page_license, 
             self.page_choice,
+            #self.page_firewall,
             self.page_key,
+            self.page_service_settings,
             self.page_env_vars,
             self.page_overview,
             self.page_installation,
@@ -61,6 +65,9 @@ class InstallerApp:
         self.installation_status = ""
 
         self.pages[self.current_page]()
+
+        self.service_start_type = tk.StringVar(value="auto")
+        self.custom_install_path = tk.StringVar(value=self.install_path)
 
     def page_env_vars(self):
         self.clear_frame()
@@ -386,35 +393,86 @@ The GNU General Public License does not permit incorporating your program into p
         choice = self.user_choice.get()
 
         if choice == "install":
+            self.current_page = self.pages.index(self.page_key)
             self.page_key()
         elif choice == "uninstall":
             self.page_uninstall()
         elif choice == "update":
             self.page_update()
 
+
+    # def page_firewall(self):
+    #     self.clear_frame()
+    #     tk.Label(self.frame, text="Would you like to create a firewall rule for port 45876?", font=("Arial", 12, "bold")).pack()
+    #     tk.Radiobutton(self.frame, text="Yes (recommended)", variable=self.firewall_choice, value="yes").pack(anchor='w')
+    #     tk.Radiobutton(self.frame, text="No", variable=self.firewall_choice, value="no").pack(anchor='w')
+    #     self.next_button.config(state=tk.NORMAL)
+
     def page_key(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Bitte geben Sie Ihren öffentlichen Schlüssel ein:").pack()
+        tk.Label(self.frame, text="Bitte geben Sie Ihren öffentlichen Schlüssel ein:").pack(pady=10)
 
-        self.user_key_entry = tk.Entry(self.frame, textvariable=self.user_key)
-        self.user_key_entry.pack()
+        # Entry für den Key
+        self.user_key_entry = tk.Entry(self.frame, textvariable=self.user_key, width=40)
+        self.user_key_entry.pack(pady=5)
 
-        self.confirm_button = tk.Button(self.frame, text="Bestätigen", command=self.confirm_key)
-        self.confirm_button.pack()
+        # Weiter-Button aktivieren/deaktivieren, je nachdem ob etwas eingetragen ist
+        def on_key_change(*args):
+            key = self.user_key.get().strip()
+            if key:
+                self.next_button.config(state=tk.NORMAL)
+            else:
+                self.next_button.config(state=tk.DISABLED)
 
-        self.next_button.pack_forget()
+        self.user_key.trace_add("write", on_key_change)
 
-        self.show_navigation(back=True, next=False)
+        # Navigation anzeigen, aber Next erstmal deaktivieren
+        self.show_navigation(back=True, next=True)
+        self.next_button.config(state=tk.DISABLED)
 
-    def confirm_key(self):
-        key = self.user_key.get().strip()
-        if key:
-            self.log(f"Öffentlicher Schlüssel gespeichert: {key}")
-            self.current_page = self.pages.index(self.page_key)  # Ensure it's correct
+    def page_service_settings(self):
+        self.clear_frame()
+        tk.Label(self.frame, text="Installation Settings", font=("Arial", 12, "bold")).pack(pady=10)
+
+        # Installationspfad
+        path_frame = tk.Frame(self.frame)
+        path_frame.pack(pady=10)
+
+        tk.Label(path_frame, text="Installationspfad:").grid(row=0, column=0, padx=5)
+        path_entry = tk.Entry(path_frame, textvariable=self.custom_install_path, width=40)
+        path_entry.grid(row=0, column=1)
+
+        def choose_path():
+            from tkinter import filedialog
+            folder = filedialog.askdirectory()
+            if folder:
+                self.custom_install_path.set(folder)
+
+        tk.Button(path_frame, text="Durchsuchen…", command=choose_path).grid(row=0, column=2, padx=5)
+
+        # Dienst-Starttyp
+        tk.Label(self.frame, text="Startverhalten des Dienstes:", font=("Arial", 10, "bold")).pack(pady=5)
+
+        ttk.Radiobutton(self.frame, text="Automatisch", variable=self.service_start_type, value="auto").pack(anchor="w")
+        ttk.Radiobutton(self.frame, text="Automatisch (verzögert)", variable=self.service_start_type, value="delayed").pack(anchor="w")
+        ttk.Radiobutton(self.frame, text="Manuell", variable=self.service_start_type, value="manual").pack(anchor="w")
+        ttk.Radiobutton(self.frame, text="Deaktiviert", variable=self.service_start_type, value="disabled").pack(anchor="w")
+
+        self.show_navigation(back=True, next=True)
+
+        def confirm_key(self):
+            key = self.user_key.get().strip()
+            if not key:
+                messagebox.showwarning("Public key missing", "Please enter your public key.")
+                return
+
+            self.log(f"Public key saved: {key}")
+
+            # Wizard-Page um 1 erhöhen
             self.current_page += 1
+
+            # Nächste Page aufrufen
             self.pages[self.current_page]()
-        else:
-            messagebox.showwarning("Öffentlicher Schlüssel fehlt", "Bitte geben Sie einen gültigen öffentlichen Schlüssel ein")
 
     def page_overview(self):
         self.clear_frame()
@@ -481,7 +539,7 @@ The GNU General Public License does not permit incorporating your program into p
 
         self.show_navigation(back=False, next=False, cancel=False)
 
-        self.root.after(500, self.install_agent)
+        threading.Thread(target=self.install_agent, daemon=True).start()
 
     def get_latest_beszel_agent_url(self):
         api_url = "https://api.github.com/repos/henrygd/beszel/releases/latest"
@@ -571,7 +629,8 @@ The GNU General Public License does not permit incorporating your program into p
         self.log_install("Agent heruntergeladen.")
         self.log("Agent heruntergeladen.")
 
-        extract_path = os.path.join(self.downloads_folder, "beszel-agent-extracted") 
+        extract_path = os.path.join(self.downloads_folder, "beszel-agent-extracted")
+        self.install_path = self.custom_install_path.get() 
         os.makedirs(self.install_path, exist_ok=True)
 
         self.log_install("Extrahiere den Agenten...")
@@ -614,7 +673,18 @@ The GNU General Public License does not permit incorporating your program into p
         self.log_install("Erstelle NSSM-Dienst...")
         self.log("Erstelle NSSM-Dienst...")
         subprocess.run([nssm_path, "install", "beszelagent", final_agent_path], capture_output=True, text=True)
-        
+        # Service Starttyp setzen
+        start_type = self.service_start_type.get()
+
+        if start_type == "auto":
+            subprocess.run([nssm_path, "set", "beszelagent", "Start", "SERVICE_AUTO_START"])
+        elif start_type == "delayed":
+            subprocess.run([nssm_path, "set", "beszelagent", "Start", "SERVICE_DELAYED_START"])
+        elif start_type == "manual":
+            subprocess.run([nssm_path, "set", "beszelagent", "Start", "SERVICE_DEMAND_START"])
+        elif start_type == "disabled":
+            subprocess.run([nssm_path, "set", "beszelagent", "Start", "SERVICE_DISABLED"])
+
         if self.user_key.get():
             subprocess.run([nssm_path, "set", "beszelagent", "AppEnvironmentExtra", f"KEY={self.user_key.get()}"])
             self.log_install("SCHLÜSSEL gesetzt.")
@@ -653,12 +723,47 @@ The GNU General Public License does not permit incorporating your program into p
         self.log_install("Überprüfe, ob der Dienst läuft...")
         self.log("Überprüfe, ob der Dienst läuft...")
         result = subprocess.run(["sc", "query", "beszelagent"], capture_output=True, text=True)
-        if "RUNNING" in result.stdout or "Wird ausgeführt" in result.stdout:
-            self.log("Dienst läuft.")
-        else:
-            self.log("Fehler: Der Dienst konnte nicht gestartet werden.")
-            self.log_install("Fehler: Der Dienst konnte nicht gestartet werden.")
-            messagebox.showerror("Fehler", "Der Dienst konnte nicht gestartet werden.")
+        stdout = result.stdout
+
+        start_type = self.service_start_type.get()
+
+        service_running = "RUNNING" in stdout or "Wird ausgeführt" in stdout
+        service_pending = "START_PENDING" in stdout or "Start pending" in stdout
+        service_stopped = "STOPPED" in stdout or "Beendet" in stdout
+
+        # AUTO
+        if start_type == "auto":
+            if service_running:
+                self.log("Service running as expected (auto).")
+            else:
+                self.log("ERROR: Service should be running (auto).")
+                messagebox.showerror("Dienstfehler", "Der Dienst konnte nicht automatisch gestartet werden.")
+                self.log_install("Service failed to start (auto).")
+                
+        # DELAYED AUTO
+        elif start_type == "delayed":
+            if service_running or service_pending:
+                self.log("Service state OK (delayed auto).")
+            else:
+                self.log("ERROR: Service should at least be pending (delayed).")
+                messagebox.showerror("Dienstfehler", "Der Dienst startet nicht wie erwartet (verzögert).")
+                self.log_install("Service failed to start (delayed auto).")
+
+        # MANUAL
+        elif start_type == "manual":
+            if service_running:
+                self.log("Service started manually, OK.")
+            else:
+                self.log("Service is stopped – OK for manual startup.")
+                self.log_install("Service manual startup type – not auto-started (correct).")
+
+        # DISABLED
+        elif start_type == "disabled":
+            if service_stopped:
+                self.log("Service is disabled and stopped – OK.")
+            else:
+                self.log("Warning: Service should be disabled!")
+                messagebox.showwarning("Dienststatus", "Dienst sollte deaktiviert sein, ist aber aktiv.")
 
         rule_name = "Beszel Agent"
         self.log_install(f"Prüfe, ob Firewall-Regel '{rule_name}' bereits existiert...")
@@ -825,15 +930,13 @@ The GNU General Public License does not permit incorporating your program into p
         self.root.update_idletasks()
 
     def log_install(self, message):
-
         self.log(message)
-
-        self.install_log_text.config(state=tk.NORMAL)
-        self.install_log_text.insert(tk.END, message + "\n")
-        self.install_log_text.config(state=tk.DISABLED)
-        self.install_log_text.yview(tk.END)
-
-        self.root.update_idletasks()
+        def write():
+            self.install_log_text.config(state=tk.NORMAL)
+            self.install_log_text.insert(tk.END, message + "\n")
+            self.install_log_text.config(state=tk.DISABLED)
+            self.install_log_text.yview(tk.END)
+        self.root.after(0, write)
 
 if __name__ == "__main__":
     root = tk.Tk()

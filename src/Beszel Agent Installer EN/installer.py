@@ -6,6 +6,7 @@ import zipfile
 import time
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
+import threading
 
 class InstallerApp:
     def __init__(self, root):
@@ -387,6 +388,7 @@ The GNU General Public License does not permit incorporating your program into p
         choice = self.user_choice.get()
 
         if choice == "install":
+            self.current_page = self.pages.index(self.page_key)
             self.page_key()
         elif choice == "uninstall":
             self.page_uninstall()
@@ -395,27 +397,33 @@ The GNU General Public License does not permit incorporating your program into p
 
     def page_key(self):
         self.clear_frame()
-        tk.Label(self.frame, text="Please enter your public key:").pack()
+        tk.Label(self.frame, text="Please enter your public key:").pack(pady=10)
 
-        self.user_key_entry = tk.Entry(self.frame, textvariable=self.user_key)
-        self.user_key_entry.pack()
+        self.user_key_entry = tk.Entry(self.frame, textvariable=self.user_key, width=40)
+        self.user_key_entry.pack(pady=5)
 
-        self.confirm_button = tk.Button(self.frame, text="Confirm", command=self.confirm_key)
-        self.confirm_button.pack()
+        def on_key_change(*args):
+            if self.user_key.get().strip():
+                self.next_button.config(state=tk.NORMAL)
+            else:
+                self.next_button.config(state=tk.DISABLED)
 
-        self.next_button.pack_forget()
+        self.user_key.trace_add("write", on_key_change)
 
-        self.show_navigation(back=True, next=False)
+        self.show_navigation(back=True, next=True)
+        self.next_button.config(state=tk.DISABLED)
 
     def confirm_key(self):
         key = self.user_key.get().strip()
-        if key:
-            self.log(f"Public key saved: {key}")
-            self.current_page = self.pages.index(self.page_key)  # Ensure it's correct
-            self.current_page += 1
-            self.pages[self.current_page]()
-        else:
-            messagebox.showwarning("Public key missing", "Please enter your public key.")
+        if not key:
+            messagebox.showwarning("Missing Key", "Please enter a public key to continue.")
+            return
+
+        self.log(f"Public key saved: {key}")
+
+        # Move to next page
+        self.current_page += 1
+        self.pages[self.current_page]()
 
     def page_overview(self):
         self.clear_frame()
@@ -482,7 +490,7 @@ The GNU General Public License does not permit incorporating your program into p
 
         self.show_navigation(back=False, next=False, cancel=False)
 
-        self.root.after(500, self.install_agent)
+        threading.Thread(target=self.install_agent, daemon=True).start()
 
     def get_latest_beszel_agent_url(self):
         api_url = "https://api.github.com/repos/henrygd/beszel/releases/latest"
@@ -651,15 +659,48 @@ The GNU General Public License does not permit incorporating your program into p
 
         self.progress["value"] = 70
 
-        self.log_install("Checking if the service is running...")
-        self.log("Checking if the service is running...")
+        self.log_install("Checking service state...")
+        self.log("Checking service state...")
+
         result = subprocess.run(["sc", "query", "beszelagent"], capture_output=True, text=True)
-        if "RUNNING" in result.stdout or "Wird ausgeführt" in result.stdout:
-            self.log("Service running.")
-        else:
-            self.log("Error: The service couldn't be started.")
-            self.log_install("Error: The service couldn't be started.")
-            messagebox.showerror("Error", "The service couldn't be started.")
+        stdout = result.stdout
+
+        start_type = self.service_start_type.get()
+
+        service_running = "RUNNING" in stdout or "Wird ausgeführt" in stdout
+        service_pending = "START_PENDING" in stdout or "Start pending" in stdout
+        service_stopped = "STOPPED" in stdout or "Beendet" in stdout
+
+        # AUTO
+        if start_type == "auto":
+            if service_running:
+                self.log("Service running as expected (auto).")
+            else:
+                messagebox.showerror("Service Error", "The service could not be started automatically.")
+                self.log_install("Service failed to start (auto).")
+
+        # DELAYED AUTO
+        elif start_type == "delayed":
+            if service_running or service_pending:
+                self.log("Service state OK (delayed auto).")
+            else:
+                messagebox.showerror("Service Error", "The service did not start as expected (delayed).")
+                self.log_install("Service failed to start (delayed auto).")
+
+        # MANUAL
+        elif start_type == "manual":
+            if service_running:
+                self.log("Service was manually started – OK.")
+            else:
+                self.log("Service is stopped – OK for manual startup.")
+                self.log_install("Manual startup type – service correctly not auto-started.")
+
+        # DISABLED
+        elif start_type == "disabled":
+            if service_stopped:
+                self.log("Service is disabled and stopped – OK.")
+            else:
+                messagebox.showwarning("Service Warning", "The service should be disabled but appears to be running.")
 
         rule_name = "Beszel Agent"
         self.log_install(f"Checking if firewall rule '{rule_name}' already exists...")
@@ -812,32 +853,37 @@ The GNU General Public License does not permit incorporating your program into p
 
         self.log(message)
 
-        self.log_text.config(state=tk.NORMAL)
-        self.log_text.insert(tk.END, message + "\n")
-        self.log_text.config(state=tk.DISABLED)
-        self.log_text.yview(tk.END)
+        def write():
+            self.install_log_text.config(state=tk.NORMAL)
+            self.install_log_text.insert(tk.END, message + "\n")
+            self.install_log_text.config(state=tk.DISABLED)
+            self.install_log_text.yview(tk.END)
+
+        self.root.after(0, write)
 
     def log_uninstall(self, message):
 
         self.log(message)
 
-        self.uninstall_log_text.config(state=tk.NORMAL)
-        self.uninstall_log_text.insert(tk.END, message + "\n")
-        self.uninstall_log_text.config(state=tk.DISABLED)
-        self.uninstall_log_text.yview(tk.END)
+        def write():
+            self.install_log_text.config(state=tk.NORMAL)
+            self.install_log_text.insert(tk.END, message + "\n")
+            self.install_log_text.config(state=tk.DISABLED)
+            self.install_log_text.yview(tk.END)
 
-        self.root.update_idletasks()
+        self.root.after(0, write)
 
     def log_install(self, message):
 
         self.log(message)
 
-        self.install_log_text.config(state=tk.NORMAL)
-        self.install_log_text.insert(tk.END, message + "\n")
-        self.install_log_text.config(state=tk.DISABLED)
-        self.install_log_text.yview(tk.END)
+        def write():
+            self.install_log_text.config(state=tk.NORMAL)
+            self.install_log_text.insert(tk.END, message + "\n")
+            self.install_log_text.config(state=tk.DISABLED)
+            self.install_log_text.yview(tk.END)
 
-        self.root.update_idletasks()
+        self.root.after(0, write)
 
 if __name__ == "__main__":
     root = tk.Tk()
