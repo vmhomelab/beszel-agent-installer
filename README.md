@@ -2,6 +2,7 @@
 ![beszelagent](https://github.com/user-attachments/assets/7dc9d747-e43c-4db1-bcbd-3071e703a9c6)
 
 The **Beszel Agent Installer** is a modern Windows installation tool for the Beszel agent by Hank.  
+⚠️This project is a third-party tool⚠️
 You can find a quick tour of the Beszel Agent here:  
 👉 https://youtu.be/6tYfgG63RVo
 And the repository of Hank here:
