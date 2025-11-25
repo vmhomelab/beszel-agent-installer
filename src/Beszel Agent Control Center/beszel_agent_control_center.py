@@ -288,6 +288,45 @@ def open_install_directory():
     except Exception as e:
         messagebox.showerror("Error", f"Could not open directory:\n{e}")
 
+### Open logs directory ###
+def open_logs_window():
+    install_path = get_install_path()
+    if not install_path:
+        messagebox.showwarning("Logs", "Could not determine install path.")
+        return
+
+    # FIX: If install_path is a file (e.g., agent.exe), use the directory
+    if os.path.isfile(install_path):
+        install_path = os.path.dirname(install_path)
+
+    # Final log file path
+    log_file = os.path.join(install_path, "install.log")
+
+    if not os.path.exists(log_file):
+        messagebox.showwarning("Logs", f"Log file not found at:\n{log_file}")
+        return
+
+    with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+        content = f.read()
+
+    win = tk.Toplevel(root)
+    win.title("Beszel Agent – Log file")
+    win.geometry("800x500")
+
+    th = THEME[current_theme]
+
+    txt = scrolledtext.ScrolledText(
+        win,
+        wrap="word",
+        font=("Consolas", 10),
+        bg=th["card"],
+        fg=th["text"],
+        insertbackground=th["text"]
+    )
+    txt.pack(fill="both", expand=True, padx=10, pady=10)
+    txt.insert("1.0", content)
+    txt.config(state="disabled")
+
 ### Open environment variables window ###
 def open_env_window():
     env_text = get_env_vars()
@@ -706,7 +745,7 @@ button_list = [
     ("Start service", start_service, "Accent.TButton"),
     ("Stop service", stop_service, "Ghost.TButton"),
     ("Restart service", restart_service, "Ghost.TButton"),
-    #("View log file", open_logs_window, "Ghost.TButton"),
+    ("View log file", open_logs_window, "Ghost.TButton"),
     ("View environment variables", open_env_window, "Ghost.TButton"),
     ("Open install directory", open_install_directory, "Ghost.TButton"),
     ("Test connection", run_connection_test, "Ghost.TButton"),

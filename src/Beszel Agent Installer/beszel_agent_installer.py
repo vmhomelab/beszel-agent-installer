@@ -158,7 +158,7 @@ class InstallerApp:
         self.custom_install_path = tk.StringVar(value=self.install_path)
         self.downloads_folder = os.path.join(os.environ["USERPROFILE"], "Downloads")
 
-        self.log_file = os.path.join(self.install_path, "install.log")
+        self.log_file = os.path.join(self.custom_install_path.get(), "install.log")
         self.control_center_source = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "BeszelAgentControl.exe"
@@ -636,6 +636,8 @@ class InstallerApp:
             folder = filedialog.askdirectory()
             if folder:
                 self.custom_install_path.set(folder)
+                # FIX: Update log file path when user selects install directory
+                self.log_file = os.path.join(folder, "install.log")
 
         ttk.Button(
             path_frame,
