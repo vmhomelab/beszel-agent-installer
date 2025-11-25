@@ -4,6 +4,8 @@
 The **Beszel Agent Installer** is a modern Windows installation tool for the Beszel agent by Hank.  
 You can find a quick tour of the Beszel Agent here:  
 👉 https://youtu.be/6tYfgG63RVo
+And the repository of Hank here:
+👉 https://github.com/henrygd/beszel
 
 ---
 
@@ -141,9 +143,6 @@ Check the installation path:
 where nssm
 ```
 Path should be something like `C:\ProgramData\chocolatey\bin\nssm.exe`.
-
-## 💻 Entwicklung
-Falls du Änderungen am Installer vornehmen möchtest:
 
 ### **1️⃣ Developement**
 - Python 3.10+
