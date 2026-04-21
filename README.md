@@ -1,3 +1,11 @@
+## ATTENTION: This repo is going to be archived on the 30th April 2026!
+Hey everybody, first of all I would like to thank everyone who used the Beszel Agent Installer and gave me feedback. Unfortunately I have been way to busy the last months (due to work and personal issues) and didn't have any time to work on this project. As life won't become any less stressful in the near future I have decided to archive this repository. As I am not a developer and need way more time to look in to any issues and potential fixes.
+So to not let you guys hanging (anymore that I did) there will be no more contibutions to this repo. The repo will stay in read-only mode. 
+
+Again I am sorry that I haven't been as active as I should have been.
+
+---
+
 # Beszel Agent Installer
 ![beszelagent](https://github.com/user-attachments/assets/7dc9d747-e43c-4db1-bcbd-3071e703a9c6)
 
